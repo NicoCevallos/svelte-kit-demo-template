@@ -1,18 +1,23 @@
 // this action (https://svelte.dev/tutorial/actions) allows us to
 // progressively enhance a <form> that already works without JS
+
+interface enhanceResponse {
+	destroy(): void;
+}
+
 export function enhance(
 	form: HTMLFormElement,
 	{
 		pending,
 		error,
-		result
+		result,
 	}: {
 		pending?: (data: FormData, form: HTMLFormElement) => void;
 		error?: (res: Response, error: Error, form: HTMLFormElement) => void;
 		result: (res: Response, form: HTMLFormElement) => void;
-	}
-) {
-	let current_token: {};
+	},
+): enhanceResponse {
+	let current_token: unknown;
 
 	async function handle_submit(e: Event) {
 		const token = (current_token = {});
@@ -27,9 +32,9 @@ export function enhance(
 			const res = await fetch(form.action, {
 				method: form.method,
 				headers: {
-					accept: 'application/json'
+					accept: "application/json",
 				},
-				body
+				body,
 			});
 
 			if (token !== current_token) return;
@@ -50,11 +55,11 @@ export function enhance(
 		}
 	}
 
-	form.addEventListener('submit', handle_submit);
+	form.addEventListener("submit", handle_submit);
 
 	return {
 		destroy() {
-			form.removeEventListener('submit', handle_submit);
-		}
+			form.removeEventListener("submit", handle_submit);
+		},
 	};
 }
